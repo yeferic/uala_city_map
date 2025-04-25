@@ -1,12 +1,47 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.kotlin.compose)
 }
+
+val keyPropertiesFile = rootProject.file("key.properties")
+val keyProperties = Properties()
+
+if (keyPropertiesFile.exists()) {
+    keyProperties.load(keyPropertiesFile.inputStream())
+} else {
+    throw GradleException(
+        "key.properties not found.",
+    )
+}
+
+val baseUrl: String =
+    keyProperties.getProperty("BASE_URL")
+        ?: throw GradleException(
+            "BASE_URL is not set in key.properties. " +
+                "This value is required for configuring the app environment.",
+        )
+
+val localDBName: String =
+    keyProperties.getProperty("LOCAL_DB_NAME")
+        ?: throw GradleException(
+            "LOCAL_DB_NAME is not set in key.properties. " +
+                "This value is required for create local db.",
+        )
 
 android {
     namespace = "com.yeferic.ualacity"
     compileSdk = 35
+
+    buildFeatures {
+        buildConfig = true
+        compose = true
+    }
 
     defaultConfig {
         applicationId = "com.yeferic.ualacity"
@@ -16,6 +51,25 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+
+        buildConfigField("String", "LOCAL_DB_NAME", "\"$localDBName\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            val keystorePassword: String? = System.getenv("KEYSTORE_PASSWORD")
+            val keyAlias: String? = System.getenv("KEY_ALIAS")
+            val keyPassword: String? = System.getenv("KEY_PASSWORD")
+
+            if (keystorePassword != null && keyAlias != null && keyPassword != null) {
+                storeFile = file("keystore.jks")
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
+        }
     }
 
     buildTypes {
@@ -36,28 +90,72 @@ android {
         jvmTarget = "11"
     }
 
-    signingConfigs {
-        create("release") {
-            val keystorePassword: String? = System.getenv("KEYSTORE_PASSWORD")
-            val keyAlias: String? = System.getenv("KEY_ALIAS")
-            val keyPassword: String? = System.getenv("KEY_PASSWORD")
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.kotlinCompiler.get()
+    }
 
-            if (keystorePassword != null && keyAlias != null && keyPassword != null) {
-                storeFile = file("keystore.jks")
-                storePassword = keystorePassword
-                this.keyAlias = keyAlias
-                this.keyPassword = keyPassword
-            }
-        }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 }
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
+    // Compose
+    implementation(platform(libs.compose.bom))
+    implementation(libs.activity.compose)
+    implementation(libs.navigation.compose)
+    implementation(libs.compose.live.data)
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+
+    // Material
     implementation(libs.material)
+
+    // Core
+    implementation(libs.core.ktx)
+
+    // Lifecycle
+    implementation(libs.lifecycle.runtime.ktx)
+
+    // Kotlin
+    implementation(libs.kotlin.reflect)
+
+    // Retrofit
+    implementation(libs.retrofit)
+
+    // OkHttp
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.interceptor)
+
+    // Serialization
+    implementation(libs.kotlin.serialziation)
+    implementation(libs.kotlin.serialization.converter)
+
+    // Dagger Hilt
+    implementation(libs.hilt)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.compose)
+
+    // Room
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
+    implementation(libs.room.ktx)
+
+    // Coroutine Test (solo test)
+    testImplementation(libs.coroutine.test)
+
+    // Unit Test & Instrumentation
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    debugImplementation(libs.ui.test.manifest)
+    testImplementation(libs.core.testing)
+
+    // Mockk
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
 }
