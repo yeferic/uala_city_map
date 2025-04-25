@@ -1,0 +1,11 @@
+# Ignore build output for this module
+build/
+captures/
+
+# Ignore local configurations
+*.iml
+local.properties
+
+# Native builds
+.externalNativeBuild/
+.cxx/
