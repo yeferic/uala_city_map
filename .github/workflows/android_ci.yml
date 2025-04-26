@@ -27,6 +27,18 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
+      - name: Create key.properties from secrets
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "${{ secrets.KEY_PROPERTIES_PRD }}" > key.properties
+          else
+            echo "${{ secrets.KEY_PROPERTIES_DEV }}" > key.properties
+          fi
+
+      - name: Debug key.properties (oculta valores sensibles)
+        run: |
+          grep BASE_URL key.properties | sed 's/=.*/=*** (hidden) *** /'
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
