@@ -35,6 +35,10 @@ jobs:
             echo "${{ secrets.KEY_PROPERTIES_DEV }}" > key.properties
           fi
 
+      - name: Debug key.properties (oculta valores sensibles)
+        run: |
+          grep BASE_URL key.properties | sed 's/=.*/=*** (hidden) *** /'
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
