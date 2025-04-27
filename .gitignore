@@ -32,3 +32,8 @@ google-services.json
 # Android Profiling
 *.hprof
 uala_city_key
+key.properties
+
+# DB Schema
+app/schemas/*
+gradlew
