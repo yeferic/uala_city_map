@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Sign APK on main branch
@@ -14,18 +17,53 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Fetch all tags
+        run: git fetch --prune --unshallow --tags
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Create version
+        run: bash ./scripts/create_tag_version.sh || exit 1
+
+      - name: Set version environment variables
+        run: |
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "VERSION_CODE=$(( $(git rev-list --count HEAD) + 1 ))" >> $GITHUB_ENV
+
+      - name: Create version tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag $TAG_NAME
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} $TAG_NAME
+
+      - name: Create key.properties from secrets
+        run: |
+          echo "${{ secrets.KEY_PROPERTIES_PRD }}" > key.properties
+
       - name: Decode keystore
         run: |
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > keystore.jks
 
+      - name: Check if keystore exists
+        run: |
+          if [ ! -f keystore.jks ]; then
+            echo "Keystore file not found!"
+            exit 1
+          fi
+
       - name: Set up Gradle permissions
         run: chmod +x ./gradlew
+
+      - name: Run Ktlint
+        run: ./gradlew ktlintCheck --no-daemon
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest --continue --no-daemon
 
       - name: Build release
         run: ./gradlew assembleRelease
@@ -33,3 +71,5 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_NAME: ${{ env.VERSION_NAME }}
+          VERSION_CODE: ${{ env.VERSION_CODE }}

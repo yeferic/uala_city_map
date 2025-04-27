@@ -47,8 +47,8 @@ android {
         applicationId = "com.yeferic.ualacity"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = System.getenv("VERSION_CODE")?.toInt() ?: 1
+        versionName = System.getenv("VERSION_NAME") ?: "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -64,7 +64,7 @@ android {
             val keyPassword: String? = System.getenv("KEY_PASSWORD")
 
             if (keystorePassword != null && keyAlias != null && keyPassword != null) {
-                storeFile = file("keystore.jks")
+                storeFile = file("$rootDir/keystore.jks")
                 storePassword = keystorePassword
                 this.keyAlias = keyAlias
                 this.keyPassword = keyPassword

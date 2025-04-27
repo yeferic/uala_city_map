@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [ develop, main ]
+    branches: [ develop ]
   pull_request:
     branches: [ develop, main ]
 
@@ -46,10 +46,11 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Ktlint
-        run: ./gradlew ktlintCheck
+        run: ./gradlew ktlintCheck --no-daemon
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest --continue --no-daemon
 
       - name: Build project
         run: ./gradlew assembleDebug
 
-      - name: Run Unit Tests
-        run: ./gradlew testDebugUnitTest
