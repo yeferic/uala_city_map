@@ -1,10 +1,14 @@
 package com.yeferic.ualacity.data.repositories
 
 import com.yeferic.ualacity.data.sources.local.dao.CityDao
+import com.yeferic.ualacity.data.sources.local.entities.City
+import com.yeferic.ualacity.data.sources.local.entities.Coord
+import com.yeferic.ualacity.data.sources.local.entities.mapToDomain
 import com.yeferic.ualacity.data.sources.remote.CityApi
 import com.yeferic.ualacity.data.sources.remote.dto.CityDTO
 import com.yeferic.ualacity.data.sources.remote.dto.CoordinatesDTO
 import com.yeferic.ualacity.data.sources.remote.dto.mapToDao
+import com.yeferic.ualacity.domain.models.CityModel
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -71,8 +75,8 @@ class CityRepositoryImplTest {
                     ),
                     CityDTO(
                         id = 1,
-                        name = "City A",
-                        country = "Country A",
+                        name = "City B",
+                        country = "Country B",
                         coordinates =
                             CoordinatesDTO(
                                 lat = 1.0,
@@ -93,5 +97,112 @@ class CityRepositoryImplTest {
                 mockCityApi.getCities()
                 mockCityDao.insertCities(cityModels)
             }
+        }
+
+    @Test
+    fun `isLocalCitiesDataLoaded should returns true when local data is loaded`() =
+        runTest(testDispatcher) {
+            // Given
+            val isLoaded = true
+            val citiesCount = 10
+            coEvery { mockCityDao.getCitiesCount() } returns citiesCount
+
+            // When
+            val response = repositoryImpl.isLocalCitiesDataLoaded()
+            advanceUntilIdle()
+
+            // Then
+            coVerify {
+                mockCityDao.getCitiesCount()
+            }
+
+            assert(response == isLoaded)
+        }
+
+    @Test
+    fun `isLocalCitiesDataLoaded should returns false when local data is empty`() =
+        runTest(testDispatcher) {
+            // Given
+            val isLoaded = false
+            val citiesCount = 0
+            coEvery { mockCityDao.getCitiesCount() } returns citiesCount
+
+            // When
+            val response = repositoryImpl.isLocalCitiesDataLoaded()
+            advanceUntilIdle()
+
+            // Then
+            coVerify {
+                mockCityDao.getCitiesCount()
+            }
+
+            assert(response == isLoaded)
+        }
+
+    @Test
+    fun `searchCityByPrefix should returns cities when prefix matches any of them`() =
+        runTest(testDispatcher) {
+            // Given
+            val prefix = "Flo"
+            val cities =
+                listOf(
+                    City(
+                        id = 1,
+                        name = "Florencia",
+                        country = "Colombia",
+                        coord =
+                            Coord(
+                                lat = 1.0,
+                                lon = 2.0,
+                            ),
+                    ),
+                    City(
+                        id = 2,
+                        name = "Florencia",
+                        country = "Italy",
+                        coord =
+                            Coord(
+                                lat = 1.0,
+                                lon = 2.0,
+                            ),
+                    ),
+                )
+
+            val cityModels = cities.map { it.mapToDomain() }
+
+            coEvery { mockCityDao.searchCitiesByPrefix(prefix) } returns cities
+
+            // When
+            val response = repositoryImpl.searchCityByPrefix(prefix)
+            advanceUntilIdle()
+
+            // Then
+            coVerify {
+                mockCityDao.searchCitiesByPrefix(prefix)
+            }
+
+            assert(response == cityModels)
+        }
+
+    @Test
+    fun `searchCityByPrefix should returns empty list when prefix does not matches any of them`() =
+        runTest(testDispatcher) {
+            // Given
+            val prefix = "Flo"
+            val cities = emptyList<City>()
+            val cityModels = emptyList<CityModel>()
+
+            coEvery { mockCityDao.searchCitiesByPrefix(prefix) } returns cities
+
+            // When
+            val response = repositoryImpl.searchCityByPrefix(prefix)
+            advanceUntilIdle()
+
+            // Then
+            coVerify {
+                mockCityDao.searchCitiesByPrefix(prefix)
+            }
+
+            assert(response == cityModels)
         }
 }
