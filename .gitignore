@@ -37,3 +37,4 @@ key.properties
 # DB Schema
 app/schemas/*
 gradlew
+app/.DS_Store
