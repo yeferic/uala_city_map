@@ -127,13 +127,16 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
 
+    // Gson
+    implementation(libs.gson)
+
     // OkHttp
     implementation(libs.okhttp)
     implementation(libs.okhttp.interceptor)
 
-    // Serialization
-    implementation(libs.kotlin.serialziation)
-    implementation(libs.kotlin.serialization.converter)
+    // Activity
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity)
 
     // Dagger Hilt
     implementation(libs.hilt)
@@ -156,6 +159,5 @@ dependencies {
     testImplementation(libs.core.testing)
 
     // Mockk
-    testImplementation(libs.mockk.android)
-    testImplementation(libs.mockk.agent)
+    testImplementation(libs.bundles.mockk)
 }

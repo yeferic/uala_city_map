@@ -1,17 +1,17 @@
 package com.yeferic.ualacity.di
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.google.gson.Gson
 import com.yeferic.ualacity.BuildConfig
+import com.yeferic.ualacity.data.sources.remote.CityApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -23,7 +23,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun providesJson() = Json { ignoreUnknownKeys = true }
+    fun providesGsonConverterFactory(): GsonConverterFactory = GsonConverterFactory.create()
+
+    @Provides
+    @Singleton
+    fun providesGson(): Gson = Gson()
 
     @Provides
     @Singleton
@@ -43,13 +47,17 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(
         @BaseUrl baseUrl: String,
-        json: Json,
+        gsonConverterFactory: GsonConverterFactory,
         client: OkHttpClient,
     ): Retrofit =
         Retrofit
             .Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(gsonConverterFactory)
             .client(client)
             .build()
+
+    @Provides
+    @Singleton
+    fun providesCityApi(retrofit: Retrofit): CityApi = retrofit.create(CityApi::class.java)
 }
