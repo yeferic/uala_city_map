@@ -9,3 +9,7 @@ annotation class BaseUrl
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class DbName
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IoDispatcher

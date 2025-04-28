@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jacoco)
 }
 
 val keyPropertiesFile = rootProject.file("key.properties")
@@ -81,6 +82,9 @@ android {
                 "proguard-rules.pro",
             )
         }
+        debug {
+            enableUnitTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -96,6 +100,17 @@ android {
 
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
+    }
+
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
+}
+
+tasks.withType(Test::class) {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
     }
 }
 
@@ -127,13 +142,16 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
 
+    // Gson
+    implementation(libs.gson)
+
     // OkHttp
     implementation(libs.okhttp)
     implementation(libs.okhttp.interceptor)
 
-    // Serialization
-    implementation(libs.kotlin.serialziation)
-    implementation(libs.kotlin.serialization.converter)
+    // Activity
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity)
 
     // Dagger Hilt
     implementation(libs.hilt)
@@ -145,17 +163,18 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
 
-    // Coroutine Test (solo test)
+    // Coroutine Test
     testImplementation(libs.coroutine.test)
 
     // Unit Test & Instrumentation
     testImplementation(libs.junit)
+    testImplementation(libs.core.testing)
+    testImplementation(libs.junit.api)
+    testRuntimeOnly(libs.junit.engine)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     debugImplementation(libs.ui.test.manifest)
-    testImplementation(libs.core.testing)
 
     // Mockk
-    testImplementation(libs.mockk.android)
-    testImplementation(libs.mockk.agent)
+    testImplementation(libs.bundles.mockk)
 }
