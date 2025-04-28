@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "UalaCity"
 include(":app")
+include(":designSystem")
