@@ -1,0 +1,12 @@
+#!/bin/sh
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+if ! echo "$COMMIT_MSG" | grep -qE '^\[(FEATURE|BUGFIX|HOTFIX)\] .+'; then
+  echo "❌ ERROR: The commit message must start with [FEATURE], [BUGFIX], or [HOTFIX]."
+  echo "Example of a valid message: [FEATURE] Add login screen"
+  exit 1
+fi
+
+exit 0
