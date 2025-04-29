@@ -105,6 +105,10 @@ android {
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
     }
+
+    lint {
+        error += "VisibleForTests"
+    }
 }
 
 tasks.withType(Test::class) {
@@ -116,6 +120,9 @@ tasks.withType(Test::class) {
 
 dependencies {
 
+    // Design System
+    implementation(project(":designSystem"))
+
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.activity.compose)
@@ -126,6 +133,7 @@ dependencies {
     implementation(libs.ui.tooling)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.compose.constraintlayout)
 
     // Material
     implementation(libs.material)
