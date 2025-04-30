@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
-class UalaTextWidgetTestTagsKtTest {
+class UalaTextWidgetKtTest {
     private val testDispatcher = StandardTestDispatcher()
 
     @get:Rule

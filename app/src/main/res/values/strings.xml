@@ -6,4 +6,7 @@
     <string name="loadscreen.done">Estamos listos!!</string>
     <string name="loadscreen.error">Ha ocurrido un error. ¿Intentar de nuevo?</string>
     <string name="loadscreen.cta">Si</string>
+
+    <!-- Map Screen -->
+    <string name="mapscreen.search">Buscar…</string>
 </resources>

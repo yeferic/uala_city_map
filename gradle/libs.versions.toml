@@ -32,7 +32,9 @@ rive = "10.1.0"
 runtime = "1.2.0"
 composeConstraint = "1.1.1"
 lottie = "6.0.0"
-
+googleServices = "4.4.2"
+googleMaps = "19.2.0"
+mapsCompose = "4.0.0"
 
 [libraries]
 # Compose
@@ -90,6 +92,10 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
+# Google
+google-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googleMaps" }
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
+
 # Coroutine test
 coroutine-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutineTest" }
 
@@ -122,6 +128,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 jacoco ={ id= "org.gradle.jacoco"}
 android-library = { id = "com.android.library", version.ref = "agp" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 
 [bundles]
 mockk = ["mockk-android", "mockk-agent"]
