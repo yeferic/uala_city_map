@@ -9,6 +9,7 @@ import com.yeferic.ualacity.data.sources.remote.dto.CityDTO
 import com.yeferic.ualacity.data.sources.remote.dto.CoordinatesDTO
 import com.yeferic.ualacity.data.sources.remote.dto.mapToDao
 import com.yeferic.ualacity.domain.models.CityModel
+import com.yeferic.ualacity.domain.repositories.LocalRepository
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -39,6 +40,9 @@ class CityRepositoryImplTest {
     @MockK
     private lateinit var mockCityDao: CityDao
 
+    @MockK
+    private lateinit var localRepositoryMock: LocalRepository
+
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -48,13 +52,14 @@ class CityRepositoryImplTest {
                 ioDispatcher = testDispatcher,
                 cityApi = mockCityApi,
                 cityDao = mockCityDao,
+                localRepository = localRepositoryMock,
             )
     }
 
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
-        confirmVerified(mockCityDao, mockCityApi)
+        confirmVerified(mockCityDao, mockCityApi, localRepositoryMock)
     }
 
     @Test
@@ -204,5 +209,66 @@ class CityRepositoryImplTest {
             }
 
             assert(response == cityModels)
+        }
+
+    /*
+     *    override suspend fun getFavoriteCities(): List<String> =
+            localRepository.getFavoriteCities().toList()
+
+        override suspend fun saveFavoriteCity(city: String) = localRepository.saveFavoriteCity(city)
+
+        override suspend fun removeFavoriteCity(city: String) =
+            localRepository.removeFavoriteCity(city)*/
+    @Test
+    fun `getFavoriteCities should returns favorite cities when local repository returns values`() =
+        runTest(testDispatcher) {
+            // Given
+            val list = setOf("Id1", "Id2")
+
+            coEvery { localRepositoryMock.getFavoriteCities() } returns list
+
+            // When
+            val response = repositoryImpl.getFavoriteCities()
+
+            // Then
+            coVerify {
+                localRepositoryMock.getFavoriteCities()
+            }
+
+            assert(response.size == list.size)
+        }
+
+    @Test
+    fun `saveFavoriteCity should call to local repository`() =
+        runTest(testDispatcher) {
+            // Given
+            val id = "Id1"
+
+            coEvery { localRepositoryMock.saveFavoriteCity(id) } just Runs
+
+            // When
+            repositoryImpl.saveFavoriteCity(id)
+
+            // Then
+            coVerify {
+                localRepositoryMock.saveFavoriteCity(id)
+            }
+        }
+
+    @Test
+    fun `removeFavoriteCity should call to local repository`() =
+        runTest(testDispatcher) {
+            // Given
+            val id = "Id1"
+
+            coEvery { localRepositoryMock.removeFavoriteCity(id) } just Runs
+
+            // When
+            repositoryImpl.removeFavoriteCity(id)
+
+            // Then
+            coVerify {
+                localRepositoryMock.removeFavoriteCity(id)
+            }
         }
 }

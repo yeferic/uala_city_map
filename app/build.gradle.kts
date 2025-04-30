@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jacoco)
+    alias(libs.plugins.google.services)
 }
 
 val keyPropertiesFile = rootProject.file("key.properties")
@@ -170,6 +171,10 @@ dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+
+    // Google
+    implementation(libs.google.maps)
+    implementation(libs.maps.compose)
 
     // Coroutine Test
     testImplementation(libs.coroutine.test)
