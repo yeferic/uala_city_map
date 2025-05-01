@@ -1,5 +1,7 @@
 package com.yeferic.ualacity.data.repositories
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.perf.FirebasePerformance
 import com.yeferic.ualacity.data.sources.local.dao.CityDao
 import com.yeferic.ualacity.data.sources.local.entities.City
 import com.yeferic.ualacity.data.sources.local.entities.Coord
@@ -27,6 +29,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CityRepositoryImplTest {
@@ -43,6 +46,12 @@ class CityRepositoryImplTest {
     @MockK
     private lateinit var localRepositoryMock: LocalRepository
 
+    @MockK(relaxed = true)
+    private lateinit var firebasePerformanceMock: FirebasePerformance
+
+    @MockK(relaxed = true)
+    private lateinit var firebaseCrashlyticsMock: FirebaseCrashlytics
+
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -53,13 +62,21 @@ class CityRepositoryImplTest {
                 cityApi = mockCityApi,
                 cityDao = mockCityDao,
                 localRepository = localRepositoryMock,
+                firebasePerformance = firebasePerformanceMock,
+                firebaseCrashlytics = firebaseCrashlyticsMock,
             )
     }
 
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
-        confirmVerified(mockCityDao, mockCityApi, localRepositoryMock)
+        confirmVerified(
+            mockCityDao,
+            mockCityApi,
+            localRepositoryMock,
+            firebasePerformanceMock,
+            firebaseCrashlyticsMock,
+        )
     }
 
     @Test
@@ -101,7 +118,34 @@ class CityRepositoryImplTest {
             coVerify {
                 mockCityApi.getCities()
                 mockCityDao.insertCities(cityModels)
+                firebasePerformanceMock.newTrace(any())
             }
+        }
+
+    @Test
+    fun `fetchRemoteCities should crashlytics when api throws exception`() =
+        runTest(testDispatcher) {
+            // Given
+            val exception = Exception("API Exception")
+
+            coEvery { mockCityApi.getCities() } throws exception
+
+            // When
+            val thrown =
+                assertThrows<Exception> {
+                    repositoryImpl.fetchRemoteCities()
+                }
+
+            advanceUntilIdle()
+
+            // Then
+            coVerify {
+                mockCityApi.getCities()
+                firebaseCrashlyticsMock.recordException(thrown)
+                firebasePerformanceMock.newTrace(any())
+            }
+
+            assert(exception.message == thrown.message)
         }
 
     @Test
@@ -211,14 +255,6 @@ class CityRepositoryImplTest {
             assert(response == cityModels)
         }
 
-    /*
-     *    override suspend fun getFavoriteCities(): List<String> =
-            localRepository.getFavoriteCities().toList()
-
-        override suspend fun saveFavoriteCity(city: String) = localRepository.saveFavoriteCity(city)
-
-        override suspend fun removeFavoriteCity(city: String) =
-            localRepository.removeFavoriteCity(city)*/
     @Test
     fun `getFavoriteCities should returns favorite cities when local repository returns values`() =
         runTest(testDispatcher) {

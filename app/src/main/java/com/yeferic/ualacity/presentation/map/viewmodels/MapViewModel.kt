@@ -9,6 +9,7 @@ import com.yeferic.ualacity.domain.models.CityQueryResultModel
 import com.yeferic.ualacity.domain.usecases.RemoveCityAsFavoriteUseCase
 import com.yeferic.ualacity.domain.usecases.SearchCityByQueryUseCase
 import com.yeferic.ualacity.domain.usecases.SetCityAsFavoriteUseCase
+import com.yeferic.ualacity.domain.usecases.TrackEventUseCase
 import com.yeferic.ualacity.presentation.map.uistates.MapScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -37,6 +38,7 @@ class MapViewModel
         private val searchCityByQueryUseCase: SearchCityByQueryUseCase,
         private val setCityAsFavoriteUseCase: SetCityAsFavoriteUseCase,
         private val removeCityAsFavoriteUseCase: RemoveCityAsFavoriteUseCase,
+        private val trackEventUseCase: TrackEventUseCase,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(MapScreenUiState())
         val uiState: StateFlow<MapScreenUiState> = _uiState
@@ -74,13 +76,16 @@ class MapViewModel
         fun onCitySelected(city: CityQueryResultModel?) {
             _citySelected.value = city
             _query.value = city?.text ?: String()
+            trackSelectCityEvent()
         }
 
         fun changeFavoriteStatus() {
             if (_citySelected.value?.isFavorite == true) {
                 removeCityAsFavorite()
+                trackCityNotAsFavoriteEvent()
             } else {
                 setCityAsFavorite()
+                trackCityAsFavoriteEvent()
             }
         }
 
@@ -113,6 +118,43 @@ class MapViewModel
                         }
                     }
                 }
+            }
+        }
+
+        fun trackFinishLoadMapEvent() {
+            trackEventUseCase.trackFinishLoadMapEvent()
+        }
+
+        fun trackAccessLocationAcceptedEvent() {
+            trackEventUseCase.trackAccessLocationAcceptedEvent()
+        }
+
+        fun trackAccessLocationDeniedEvent() {
+            trackEventUseCase.trackAccessLocationDeniedEvent()
+        }
+
+        fun trackFocusOnSearchEvent() {
+            trackEventUseCase.trackFocusOnSearchEvent()
+        }
+
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        fun trackSelectCityEvent() {
+            _citySelected.value?.let {
+                trackEventUseCase.trackSelectCityEvent(cityId = it.id, cityName = it.text)
+            }
+        }
+
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        fun trackCityAsFavoriteEvent() {
+            _citySelected.value?.let {
+                trackEventUseCase.trackCityAsFavoriteEvent(cityId = it.id, cityName = it.text)
+            }
+        }
+
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        fun trackCityNotAsFavoriteEvent() {
+            _citySelected.value?.let {
+                trackEventUseCase.trackCityNotAsFavoriteEvent(cityId = it.id, cityName = it.text)
             }
         }
     }

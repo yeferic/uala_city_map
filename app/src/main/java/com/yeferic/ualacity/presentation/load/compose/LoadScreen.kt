@@ -47,6 +47,7 @@ fun LoadScreen(
                 exit = fadeOut(tween(ANIMATION_DURATION)),
             ) {
                 LoadScreenErrorWidget {
+                    viewModel.trackRetryLoadDataEvent()
                     viewModel.getIsDataLoaded()
                 }
             }

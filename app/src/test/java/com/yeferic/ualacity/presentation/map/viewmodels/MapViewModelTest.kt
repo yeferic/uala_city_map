@@ -6,12 +6,15 @@ import com.yeferic.ualacity.domain.models.CoordinatesModel
 import com.yeferic.ualacity.domain.usecases.RemoveCityAsFavoriteUseCase
 import com.yeferic.ualacity.domain.usecases.SearchCityByQueryUseCase
 import com.yeferic.ualacity.domain.usecases.SetCityAsFavoriteUseCase
+import com.yeferic.ualacity.domain.usecases.TrackEventUseCase
 import io.mockk.MockKAnnotations
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +47,9 @@ class MapViewModelTest {
     @MockK
     private lateinit var removeCityAsFavoriteUseCaseMock: RemoveCityAsFavoriteUseCase
 
+    @MockK(relaxed = true)
+    private lateinit var trackEventUseCaseMock: TrackEventUseCase
+
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -54,6 +60,7 @@ class MapViewModelTest {
                 searchCityByQueryUseCase = searchCityByQueryUseCaseMock,
                 setCityAsFavoriteUseCase = setCityAsFavoriteUseCaseMock,
                 removeCityAsFavoriteUseCase = removeCityAsFavoriteUseCaseMock,
+                trackEventUseCase = trackEventUseCaseMock,
             )
     }
 
@@ -64,6 +71,7 @@ class MapViewModelTest {
             searchCityByQueryUseCaseMock,
             setCityAsFavoriteUseCaseMock,
             removeCityAsFavoriteUseCaseMock,
+            trackEventUseCaseMock,
         )
     }
 
@@ -86,13 +94,17 @@ class MapViewModelTest {
         val newCity =
             mockk<CityQueryResultModel> {
                 every { text } returns "New City"
+                every { id } returns 1
             }
 
         // When
         viewModel.onCitySelected(newCity)
 
         // Then
-        verify { newCity.text }
+        verify {
+            newCity.text
+            newCity.id
+        }
         confirmVerified(newCity)
 
         assert(viewModel.query.value == newCity.text)
@@ -123,6 +135,11 @@ class MapViewModelTest {
             coEvery { setCityAsFavoriteUseCaseMock(cityId.toString()) } returns
                 flowOf(UseCaseStatus.Success(true))
 
+            every { trackEventUseCaseMock.trackSelectCityEvent(newCity.id, newCity.text) } just Runs
+            every {
+                trackEventUseCaseMock.trackCityAsFavoriteEvent(newCity.id, newCity.text)
+            } just Runs
+
             // When
             viewModel.changeFavoriteStatus()
             advanceUntilIdle()
@@ -130,6 +147,8 @@ class MapViewModelTest {
             // Then
             verify {
                 setCityAsFavoriteUseCaseMock.invoke(cityId.toString())
+                trackEventUseCaseMock.trackSelectCityEvent(newCity.id, newCity.text)
+                trackEventUseCaseMock.trackCityAsFavoriteEvent(newCity.id, newCity.text)
             }
 
             assert(cityStates.any { it?.isFavorite == true && it.id == cityId })
@@ -161,6 +180,11 @@ class MapViewModelTest {
             coEvery { removeCityAsFavoriteUseCaseMock(cityId.toString()) } returns
                 flowOf(UseCaseStatus.Success(true))
 
+            every { trackEventUseCaseMock.trackSelectCityEvent(newCity.id, newCity.text) } just Runs
+            every {
+                trackEventUseCaseMock.trackCityNotAsFavoriteEvent(newCity.id, newCity.text)
+            } just Runs
+
             // When
             viewModel.changeFavoriteStatus()
             advanceUntilIdle()
@@ -168,6 +192,8 @@ class MapViewModelTest {
             // Then
             verify {
                 removeCityAsFavoriteUseCaseMock.invoke(cityId.toString())
+                trackEventUseCaseMock.trackSelectCityEvent(newCity.id, newCity.text)
+                trackEventUseCaseMock.trackCityNotAsFavoriteEvent(newCity.id, newCity.text)
             }
 
             assert(cityStates.any { it?.isFavorite == false && it.id == cityId })

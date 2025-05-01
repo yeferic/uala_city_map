@@ -26,6 +26,8 @@ fun UalaMapWidget(
     cameraPosition: CameraPositionState,
     onMapClick: () -> Unit,
     onMapLoaded: () -> Unit,
+    onAccessLocationEnable: () -> Unit = {},
+    onAccessLocationDisable: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -39,7 +41,13 @@ fun UalaMapWidget(
     val launcher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission(),
-        ) {}
+        ) { isGranted ->
+            if (isGranted) {
+                onAccessLocationEnable()
+            } else {
+                onAccessLocationDisable()
+            }
+        }
 
     LaunchedEffect(Unit) {
         launcher.launch(locationPermission)
