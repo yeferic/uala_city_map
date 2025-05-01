@@ -4,6 +4,7 @@ import androidx.compose.ui.text.TextStyle
 import com.yeferic.desingsystem.tokens.RobotoFontFamily
 import com.yeferic.desingsystem.tokens.backgroundBlue
 import com.yeferic.desingsystem.tokens.textLightWeight
+import com.yeferic.desingsystem.tokens.textMediumSize
 import com.yeferic.desingsystem.tokens.textNormalSize
 import com.yeferic.desingsystem.tokens.textNormalWeight
 import com.yeferic.desingsystem.tokens.textThinWeight
@@ -51,6 +52,24 @@ sealed class UalaTextStyle(
             fontWeight = textNormalWeight,
             fontSize = textNormalSize,
             color = backgroundBlue,
+        ),
+    )
+
+    data object TextFieldSearch : UalaTextStyle(
+        TextStyle(
+            fontFamily = RobotoFontFamily,
+            fontWeight = textNormalWeight,
+            fontSize = textMediumSize,
+            color = white,
+        ),
+    )
+
+    data object TextFieldSearchPlaceHolder : UalaTextStyle(
+        TextStyle(
+            fontFamily = RobotoFontFamily,
+            fontWeight = textThinWeight,
+            fontSize = textMediumSize,
+            color = white.copy(alpha = 0.2f),
         ),
     )
 }

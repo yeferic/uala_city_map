@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.ui.tooling)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.activity.compose)
 
     // Material
     implementation(libs.material)
@@ -58,10 +59,14 @@ dependencies {
     // Lottie
     implementation(libs.lottie)
 
+    // Google
+    implementation(libs.google.maps)
+    implementation(libs.maps.compose)
+
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.compose.test.junit4)
-    // androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.espresso.core)
     debugApi(libs.compose.test.manifest)
 }

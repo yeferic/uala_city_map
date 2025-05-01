@@ -7,6 +7,7 @@ import com.yeferic.ualacity.data.sources.remote.dto.mapToDao
 import com.yeferic.ualacity.di.IoDispatcher
 import com.yeferic.ualacity.domain.models.CityModel
 import com.yeferic.ualacity.domain.repositories.CityRepository
+import com.yeferic.ualacity.domain.repositories.LocalRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -17,6 +18,7 @@ class CityRepositoryImpl
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
         private val cityApi: CityApi,
         private val cityDao: CityDao,
+        private val localRepository: LocalRepository,
     ) : CityRepository {
         override suspend fun fetchRemoteCities() {
             withContext(ioDispatcher) {
@@ -33,4 +35,12 @@ class CityRepositoryImpl
             withContext(ioDispatcher) {
                 cityDao.searchCitiesByPrefix(prefix = prefix).map { it.mapToDomain() }
             }
+
+        override suspend fun getFavoriteCities(): List<String> =
+            localRepository.getFavoriteCities().toList()
+
+        override suspend fun saveFavoriteCity(city: String) = localRepository.saveFavoriteCity(city)
+
+        override suspend fun removeFavoriteCity(city: String) =
+            localRepository.removeFavoriteCity(city)
     }
