@@ -35,6 +35,9 @@ lottie = "6.0.0"
 googleServices = "4.4.2"
 googleMaps = "19.2.0"
 mapsCompose = "4.0.0"
+firebaseBom = "33.13.0"
+firebasPerfPlugin = "1.4.2"
+firebaseCrashlyticsPlugin = "3.0.3"
 
 [libraries]
 # Compose
@@ -96,6 +99,12 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 google-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googleMaps" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 
+# Firebase
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-performance = { group = "com.google.firebase", name = "firebase-perf-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+
 # Coroutine test
 coroutine-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutineTest" }
 
@@ -129,6 +138,8 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 jacoco ={ id= "org.gradle.jacoco"}
 android-library = { id = "com.android.library", version.ref = "agp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebasPerfPlugin" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
 
 [bundles]
 mockk = ["mockk-android", "mockk-agent"]

@@ -1,5 +1,7 @@
 package com.yeferic.ualacity.data.repositories
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.perf.FirebasePerformance
 import com.yeferic.ualacity.data.sources.local.dao.CityDao
 import com.yeferic.ualacity.data.sources.local.entities.mapToDomain
 import com.yeferic.ualacity.data.sources.remote.CityApi
@@ -19,10 +21,25 @@ class CityRepositoryImpl
         private val cityApi: CityApi,
         private val cityDao: CityDao,
         private val localRepository: LocalRepository,
+        private val firebasePerformance: FirebasePerformance,
+        private val firebaseCrashlytics: FirebaseCrashlytics,
     ) : CityRepository {
+        companion object {
+            private const val FETCH_CITIES_METHOD = "fetchRemoteCities"
+        }
+
         override suspend fun fetchRemoteCities() {
-            withContext(ioDispatcher) {
-                cityDao.insertCities(cityApi.getCities().map { it.mapToDao() })
+            val trace = firebasePerformance.newTrace(FETCH_CITIES_METHOD)
+            trace.start()
+            try {
+                withContext(ioDispatcher) {
+                    cityDao.insertCities(cityApi.getCities().map { it.mapToDao() })
+                }
+            } catch (e: Exception) {
+                firebaseCrashlytics.recordException(e)
+                throw e
+            } finally {
+                trace.stop()
             }
         }
 

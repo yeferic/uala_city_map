@@ -27,6 +27,7 @@ fun MapScreenHeader(
     setCityAsFavorite: () -> Unit,
     onValueChange: (String) -> Unit,
     onSelected: (CityQueryResultModel?) -> Unit,
+    onFocusEvent: () -> Unit = {},
 ) {
     Box(
         modifier =
@@ -64,6 +65,7 @@ fun MapScreenHeader(
             leftIcon = Icons.Default.Search,
             rightIcon = Icons.Default.Star,
             onRightIconClick = setCityAsFavorite,
+            onFocus = onFocusEvent,
         )
     }
 }

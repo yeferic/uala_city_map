@@ -4,12 +4,16 @@ import com.yeferic.ualacity.core.commons.UseCaseStatus
 import com.yeferic.ualacity.data.errormappers.CityRepositoryError
 import com.yeferic.ualacity.domain.usecases.FetchRemoteDataUseCase
 import com.yeferic.ualacity.domain.usecases.GetLocalDataIsLoadedUseCase
+import com.yeferic.ualacity.domain.usecases.TrackEventUseCase
 import com.yeferic.ualacity.presentation.load.uistates.LoadScreenUiState
 import io.mockk.MockKAnnotations
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.just
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -36,6 +40,9 @@ class LoadViewModelTest {
     @MockK
     private lateinit var getLocalDataIsLoadedUseCaseMock: GetLocalDataIsLoadedUseCase
 
+    @MockK(relaxed = true)
+    private lateinit var trackEventUseCaseMock: TrackEventUseCase
+
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -45,6 +52,7 @@ class LoadViewModelTest {
                 ioDispatcher = testDispatcher,
                 getLocalDataUseCase = getLocalDataIsLoadedUseCaseMock,
                 fetchRemoteDataUseCase = fetchRemoteDataUseCaseMock,
+                trackEventUseCase = trackEventUseCaseMock,
             )
     }
 
@@ -54,6 +62,7 @@ class LoadViewModelTest {
         confirmVerified(
             fetchRemoteDataUseCaseMock,
             getLocalDataIsLoadedUseCaseMock,
+            trackEventUseCaseMock,
         )
     }
 
@@ -128,6 +137,8 @@ class LoadViewModelTest {
 
             coEvery { fetchRemoteDataUseCaseMock.invoke() } returns flowOf()
 
+            every { trackEventUseCaseMock.trackStartLoadDataEvent() } just Runs
+
             // When
             viewModel.getIsDataLoaded()
             advanceUntilIdle()
@@ -136,6 +147,7 @@ class LoadViewModelTest {
             coVerify {
                 getLocalDataIsLoadedUseCaseMock.invoke()
                 fetchRemoteDataUseCaseMock.invoke()
+                trackEventUseCaseMock.trackStartLoadDataEvent()
             }
 
             assert(uiStates.any { it.isLoading })
@@ -159,6 +171,9 @@ class LoadViewModelTest {
             coEvery { fetchRemoteDataUseCaseMock.invoke() } returns
                 flowOf(UseCaseStatus.Success(dataLoaded))
 
+            every { trackEventUseCaseMock.trackStartLoadDataEvent() } just Runs
+            every { trackEventUseCaseMock.trackFinishLoadDataEvent() } just Runs
+
             // When
             viewModel.fetchRemoteData()
             advanceUntilIdle()
@@ -166,6 +181,8 @@ class LoadViewModelTest {
             // Then
             coVerify {
                 fetchRemoteDataUseCaseMock.invoke()
+                trackEventUseCaseMock.trackStartLoadDataEvent()
+                trackEventUseCaseMock.trackFinishLoadDataEvent()
             }
 
             assert(
@@ -188,6 +205,9 @@ class LoadViewModelTest {
             coEvery { fetchRemoteDataUseCaseMock.invoke() } returns
                 flowOf(UseCaseStatus.Error(error))
 
+            every { trackEventUseCaseMock.trackStartLoadDataEvent() } just Runs
+            every { trackEventUseCaseMock.trackFailLoadDataEvent() } just Runs
+
             // When
             viewModel.fetchRemoteData()
             advanceUntilIdle()
@@ -195,6 +215,8 @@ class LoadViewModelTest {
             // Then
             coVerify {
                 fetchRemoteDataUseCaseMock.invoke()
+                trackEventUseCaseMock.trackStartLoadDataEvent()
+                trackEventUseCaseMock.trackFailLoadDataEvent()
             }
 
             assert(uiStates.any { it.error == error })

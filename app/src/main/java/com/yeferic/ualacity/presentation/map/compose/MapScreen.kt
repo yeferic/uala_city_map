@@ -43,7 +43,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val city by viewModel.citySelected.collectAsState()
     val result by viewModel.queryResult.collectAsState()
 
-    println(result)
     LaunchedEffect(city) {
         city?.let {
             cameraPositionState.animate(
@@ -77,7 +76,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             },
             onMapLoaded = {
                 isMapLoaded = true
+                viewModel.trackFinishLoadMapEvent()
             },
+            onAccessLocationEnable = viewModel::trackAccessLocationAcceptedEvent,
+            onAccessLocationDisable = viewModel::trackAccessLocationDeniedEvent,
         )
 
         MapScreenHeader(
@@ -104,6 +106,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             query = query,
             setCityAsFavorite = viewModel::changeFavoriteStatus,
             isLoading = uiState.isLoading,
+            onFocusEvent = viewModel::trackFocusOnSearchEvent,
         )
 
         if (isMapLoaded.not()) {

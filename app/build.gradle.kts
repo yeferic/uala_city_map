@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jacoco)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.perf)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 val keyPropertiesFile = rootProject.file("key.properties")
@@ -110,6 +112,12 @@ android {
     lint {
         error += "VisibleForTests"
     }
+
+    testOptions {
+        unitTests {
+            unitTests.isReturnDefaultValues = true
+        }
+    }
 }
 
 tasks.withType(Test::class) {
@@ -175,6 +183,12 @@ dependencies {
     // Google
     implementation(libs.google.maps)
     implementation(libs.maps.compose)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.performance)
+    implementation(libs.firebase.analytics)
 
     // Coroutine Test
     testImplementation(libs.coroutine.test)
