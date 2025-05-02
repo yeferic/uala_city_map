@@ -36,4 +36,12 @@ key.properties
 
 # DB Schema
 app/schemas/*
+
+# Gradlew
 gradlew
+
+# DS_Store
+app/.DS_Store
+
+# buildSrc
+/buildSrc/

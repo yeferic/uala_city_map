@@ -35,6 +35,10 @@ jobs:
             echo "${{ secrets.KEY_PROPERTIES_DEV }}" > key.properties
           fi
 
+      - name: Decode google-services.json
+        run: |
+            echo "${{ secrets.GOOGLE_SERVICE_JSON }}" | base64 -d > app/google-services.json
+
       - name: Debug key.properties (oculta valores sensibles)
         run: |
           grep BASE_URL key.properties | sed 's/=.*/=*** (hidden) *** /'
@@ -44,6 +48,9 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
+
+      - name: Run Lint
+        run: ./gradlew lint --no-daemon
 
       - name: Run Ktlint
         run: ./gradlew ktlintCheck --no-daemon

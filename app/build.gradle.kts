@@ -7,6 +7,10 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jacoco)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.perf)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 val keyPropertiesFile = rootProject.file("key.properties")
@@ -81,6 +85,9 @@ android {
                 "proguard-rules.pro",
             )
         }
+        debug {
+            enableUnitTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -97,9 +104,33 @@ android {
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
+
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
+
+    lint {
+        error += "VisibleForTests"
+    }
+
+    testOptions {
+        unitTests {
+            unitTests.isReturnDefaultValues = true
+        }
+    }
+}
+
+tasks.withType(Test::class) {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
 }
 
 dependencies {
+
+    // Design System
+    implementation(project(":designSystem"))
 
     // Compose
     implementation(platform(libs.compose.bom))
@@ -111,6 +142,7 @@ dependencies {
     implementation(libs.ui.tooling)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.compose.constraintlayout)
 
     // Material
     implementation(libs.material)
@@ -127,13 +159,16 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
 
+    // Gson
+    implementation(libs.gson)
+
     // OkHttp
     implementation(libs.okhttp)
     implementation(libs.okhttp.interceptor)
 
-    // Serialization
-    implementation(libs.kotlin.serialziation)
-    implementation(libs.kotlin.serialization.converter)
+    // Activity
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity)
 
     // Dagger Hilt
     implementation(libs.hilt)
@@ -145,17 +180,28 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
 
-    // Coroutine Test (solo test)
+    // Google
+    implementation(libs.google.maps)
+    implementation(libs.maps.compose)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.performance)
+    implementation(libs.firebase.analytics)
+
+    // Coroutine Test
     testImplementation(libs.coroutine.test)
 
     // Unit Test & Instrumentation
     testImplementation(libs.junit)
+    testImplementation(libs.core.testing)
+    testImplementation(libs.junit.api)
+    testRuntimeOnly(libs.junit.engine)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     debugImplementation(libs.ui.test.manifest)
-    testImplementation(libs.core.testing)
 
     // Mockk
-    testImplementation(libs.mockk.android)
-    testImplementation(libs.mockk.agent)
+    testImplementation(libs.bundles.mockk)
 }

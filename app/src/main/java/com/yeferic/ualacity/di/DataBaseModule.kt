@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import com.yeferic.ualacity.BuildConfig
 import com.yeferic.ualacity.data.sources.local.AppDatabase
+import com.yeferic.ualacity.data.sources.local.dao.CityDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,4 +29,7 @@ class DataBaseModule {
             .databaseBuilder(application, AppDatabase::class.java, dbName)
             .fallbackToDestructiveMigration(false)
             .build()
+
+    @Provides
+    fun provideCityDao(appDataBase: AppDatabase): CityDao = appDataBase.cityDao()
 }

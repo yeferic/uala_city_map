@@ -7,24 +7,37 @@ composeLiveData = "1.8.0"
 coreKtx = "1.16.0"
 coreTesting = "2.2.0"
 coroutineTest = "1.7.3"
-daggerHilt = "2.49"
+daggerHilt = "2.56.2"
 espressoCore = "3.6.1"
 hiltCompose = "1.2.0"
 junit = "4.13.2"
-kotlin = "2.0.0"
+kotlin = "2.1.20"
 kotlinCompiler = "1.5.11"
 kotlinSerialization = "1.6.3"
 kotlinSerializationConverter = "1.0.0"
-ksp = "2.0.0-1.0.21"
+ksp = "2.1.20-1.0.32"
 ktlint = "12.1.0"
 lifecycleRuntimeKtx = "2.8.7"
-mockk = "1.13.7"
+mockk = "1.14.0"
 material = "1.12.0"
 navigationCompose = "2.8.9"
 okhttp = "4.12.0"
 retrofit = "2.11.0"
 room = "2.7.1"
-
+appcompat = "1.7.0"
+activity = "1.10.1"
+junitJupiter = "5.9.2"
+jacoco = "0.8.7"
+rive = "10.1.0"
+runtime = "1.2.0"
+composeConstraint = "1.1.1"
+lottie = "6.0.0"
+googleServices = "4.4.2"
+googleMaps = "19.2.0"
+mapsCompose = "4.0.0"
+firebaseBom = "33.13.0"
+firebasPerfPlugin = "1.4.2"
+firebaseCrashlyticsPlugin = "3.0.3"
 
 [libraries]
 # Compose
@@ -32,6 +45,7 @@ activity-compose = { group = "androidx.activity", name = "activity-compose", ver
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 compose-live-data = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "composeLiveData" }
+compose-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "composeConstraint" }
 ui = { group = "androidx.compose.ui", name = "ui" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
@@ -53,6 +67,9 @@ kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", vers
 # Retrofit
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 
+# Gson
+gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+
 # OkHttp
 okhttp = {group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp"}
 okhttp-interceptor = {group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref="okhttp"}
@@ -60,6 +77,13 @@ okhttp-interceptor = {group = "com.squareup.okhttp3", name = "logging-intercepto
 # Serialization
 kotlin-serialziation = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization"}
 kotlin-serialization-converter = {group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "kotlinSerializationConverter"}
+
+# Rive
+rive = { group = "app.rive", name = "rive-android", version.ref = "rive" }
+runtime = { group = "androidx.startup", name = "startup-runtime", version.ref = "runtime" }
+
+#Lottie
+lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 
 # Dagger hilt
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "daggerHilt" }
@@ -71,6 +95,16 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
+# Google
+google-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googleMaps" }
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
+
+# Firebase
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-performance = { group = "com.google.firebase", name = "firebase-perf-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+
 # Coroutine test
 coroutine-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutineTest" }
 
@@ -80,10 +114,18 @@ androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "coreTesting" }
+compose-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 
 # Mockk
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+
+# Junit5
+junit-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junitJupiter" }
+junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junitJupiter" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -92,6 +134,13 @@ ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+jacoco ={ id= "org.gradle.jacoco"}
+android-library = { id = "com.android.library", version.ref = "agp" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebasPerfPlugin" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
 
 [bundles]
 mockk = ["mockk-android", "mockk-agent"]
+rive = ["rive", "runtime"]
